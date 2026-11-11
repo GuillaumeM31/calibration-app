@@ -2,7 +2,7 @@
 # Calibration Curve Analysis - v3.5
 # Weighted regression, quantification, diagnostics and group statistics
 #
-# Copyright (c) 2026 Guillaume Marti
+# Copyright (c) 2026 Guillaume Marti, University of Toulouse
 # Licensed under the CeCILL-B license (BSD-like, compatible with French law):
 # https://cecill.info/licences/Licence_CeCILL-B_V1-en.html - see the LICENSE file.
 #
@@ -316,6 +316,38 @@ SAMPLE_NUMERIC <- c("Response", "Theoretical_Concentration", "Dilution_Factor")
 # UI
 # =============================================================================
 
+# Downloads: fetch the file inside the page and save it as a blob. In Shinylive
+# (webR in the browser), a plain link click opens a new tab that can miss the
+# in-browser R server and saves an HTML page instead of the PDF/CSV.
+download_js <- "
+document.addEventListener('click', async function (e) {
+  var a = e.target.closest('a.shiny-download-link');
+  if (!a) return;
+  e.preventDefault();
+  e.stopPropagation();
+  var href = a.getAttribute('href');
+  if (!href || a.classList.contains('disabled')) {
+    alert('The file is not ready yet: load your data first.');
+    return;
+  }
+  try {
+    var r = await fetch(href);
+    var type = r.headers.get('content-type') || '';
+    if (!r.ok || type.indexOf('text/html') === 0) throw new Error('the app could not create the file (check that data are loaded)');
+    var cd = r.headers.get('content-disposition') || '';
+    var m = cd.match(/filename\\*?=(?:UTF-8'')?\"?([^\";]+)\"?/i);
+    var name = m ? decodeURIComponent(m[1]) : 'download';
+    var url = URL.createObjectURL(await r.blob());
+    var tmp = document.createElement('a');
+    tmp.href = url; tmp.download = name; tmp.style.display = 'none';
+    document.body.appendChild(tmp); tmp.click(); tmp.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 30000);
+  } catch (err) {
+    alert('Download failed: ' + err.message);
+  }
+}, true);
+"
+
 app_css <- "
   .dataTables_wrapper, table.dataTable { font-size: 0.95rem; }
   .card-header { font-weight: 600; font-size: 1.05rem; }
@@ -351,14 +383,14 @@ ui <- page_navbar(
   theme = bs_theme(version = 5, bootswatch = "flatly", primary = "#2C3E50",
                    font_scale = 1.1),
   fillable = FALSE,
-  header = tags$head(tags$style(HTML(app_css))),
+  header = tags$head(tags$style(HTML(app_css)), tags$script(HTML(download_js))),
   footer = div(
     class = "text-muted text-center small py-3 px-3 border-top mt-3",
     "⚠ For educational purposes only. This software is provided \"as is\", without warranty of any kind: ",
     "the authors do not guarantee the accuracy of the results and accept no liability for their use. ",
     "Always verify results independently before using them in research, publications or regulated contexts. ",
     tags$br(),
-    "© 2026 Guillaume Marti - ",
+    "© 2026 Guillaume Marti, University of Toulouse - ",
     tags$a("CeCILL-B licence", href = "https://cecill.info/licences/Licence_CeCILL-B_V1-en.html", target = "_blank"),
     " - Data are processed locally and are not stored or transmitted by the app."
   ),

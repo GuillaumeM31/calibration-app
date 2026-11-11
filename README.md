@@ -32,7 +32,7 @@ Templates can be downloaded from tab 2.
 
 ## Licence
 
-© 2026 Guillaume Marti. Distributed under the [CeCILL-B licence](https://cecill.info/licences/Licence_CeCILL-B_V1-en.html)
+© 2026 Guillaume Marti, University of Toulouse. Distributed under the [CeCILL-B licence](https://cecill.info/licences/Licence_CeCILL-B_V1-en.html)
 (BSD-like free software licence compatible with French law): see [LICENSE](LICENSE)
 (English) and [LICENCE-fr.txt](LICENCE-fr.txt) (French). You may reuse and modify the
 code provided you cite the original authors.
