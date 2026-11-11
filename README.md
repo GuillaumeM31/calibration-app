@@ -3,7 +3,7 @@
 Web app for building calibration curves (linear, quadratic, log, power; OLS or
 1/X, 1/X² weighting), quantifying samples and comparing groups.
 
-**Use it online:** https://YOUR-GITHUB-USERNAME.github.io/calibration-app/
+**Use it online:** https://guillaumem31.github.io/calibration-app/
 
 - No installation needed: R runs inside your web browser (Shinylive / webR).
 - The first load takes 20-60 s (R is downloaded into the browser), later visits are faster.
