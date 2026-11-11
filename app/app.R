@@ -2,6 +2,14 @@
 # Calibration Curve Analysis - v3.5
 # Weighted regression, quantification, diagnostics and group statistics
 #
+# Copyright (c) 2026 Guillaume Marti
+# Licensed under the CeCILL-B license (BSD-like, compatible with French law):
+# https://cecill.info/licences/Licence_CeCILL-B_V1-en.html - see the LICENSE file.
+#
+# DISCLAIMER: for educational purposes only. Provided "as is", without any
+# warranty; the authors do not guarantee the accuracy of the results and accept
+# no liability for their use. Always verify results independently.
+#
 # Main changes vs v3.4 (details in the "Guide" tab):
 #  - Bug fixes: manual table editing (0-based DT columns), Cook's distance,
 #    blank (C = 0) handling in accuracy and weighting, stale results after
@@ -344,6 +352,16 @@ ui <- page_navbar(
                    font_scale = 1.1),
   fillable = FALSE,
   header = tags$head(tags$style(HTML(app_css))),
+  footer = div(
+    class = "text-muted text-center small py-3 px-3 border-top mt-3",
+    "⚠ For educational purposes only. This software is provided \"as is\", without warranty of any kind: ",
+    "the authors do not guarantee the accuracy of the results and accept no liability for their use. ",
+    "Always verify results independently before using them in research, publications or regulated contexts. ",
+    tags$br(),
+    "© 2026 Guillaume Marti - ",
+    tags$a("CeCILL-B licence", href = "https://cecill.info/licences/Licence_CeCILL-B_V1-en.html", target = "_blank"),
+    " - Data are processed locally and are not stored or transmitted by the app."
+  ),
 
   # ---------------------------------------------------------------- Tab 1
   nav_panel(
@@ -548,6 +566,17 @@ ui <- page_navbar(
   # ---------------------------------------------------------------- Guide
   nav_panel(
     "Guide",
+    div(
+      class = "alert alert-warning",
+      tags$b("⚠ Disclaimer - educational use only. "),
+      "This application was developed for teaching calibration and quantification to Master students. ",
+      "It is provided \"as is\", without warranty of any kind, express or implied. The authors do not guarantee ",
+      "the accuracy, completeness or fitness for a particular purpose of the results and cannot be held liable ",
+      "for any consequence of their use. It is not a validated tool (GLP/GMP, clinical or regulatory): always ",
+      "check the results independently. Distributed under the ",
+      tags$a("CeCILL-B licence", href = "https://cecill.info/licences/Licence_CeCILL-B_V1-en.html", target = "_blank"),
+      "."
+    ),
     card(
       card_header("Workflow"),
       tags$ol(

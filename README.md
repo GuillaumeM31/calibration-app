@@ -21,6 +21,22 @@ CSV files with `;`, `,` or tab separators; decimal commas are accepted (French E
 
 Templates can be downloaded from tab 2.
 
+## Disclaimer
+
+> **For educational purposes only.** This application was developed for teaching
+> calibration and quantification to Master students. It is provided "as is", without
+> warranty of any kind, express or implied. The authors do not guarantee the accuracy,
+> completeness or fitness for a particular purpose of the results and cannot be held
+> liable for any consequence of their use. It is not a validated tool (GLP/GMP, clinical
+> or regulatory use): always verify results independently.
+
+## Licence
+
+© 2026 Guillaume Marti. Distributed under the [CeCILL-B licence](https://cecill.info/licences/Licence_CeCILL-B_V1-en.html)
+(BSD-like free software licence compatible with French law): see [LICENSE](LICENSE)
+(English) and [LICENCE-fr.txt](LICENCE-fr.txt) (French). You may reuse and modify the
+code provided you cite the original authors.
+
 ## For maintainers
 
 - `app/app.R` is the application (plus example data in `app/`).
