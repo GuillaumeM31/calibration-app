@@ -298,6 +298,16 @@ apply_edits <- function(df, info, numeric_cols) {
   df
 }
 
+# Drop the selected rows (DT indices); keep one empty row so the table stays editable
+remove_rows <- function(df, rows) {
+  rows <- intersect(rows, seq_len(nrow(df)))
+  if (!length(rows)) return(df)
+  df <- df[-rows, , drop = FALSE]
+  rownames(df) <- NULL
+  if (nrow(df) == 0) df <- add_empty_row(df)
+  df
+}
+
 add_empty_row <- function(df) {
   df[nrow(df) + 1, ] <- NA
   chr <- vapply(df, is.character, logical(1))
@@ -461,10 +471,11 @@ ui <- page_navbar(
         card(card_header("Equation and point selection"),
              uiOutput("regression_equation"),
              uiOutput("point_selection_summary")),
-        card(card_header("Calibration data (editable: double-click a cell)"),
+        card(card_header("Calibration data"),
+             helpText("Click rows to select them (click again to unselect); double-click a cell to edit it."),
              div(class = "d-flex gap-2 mb-2",
                  actionButton("add_calib_row", "Add row", class = "btn-sm btn-success"),
-                 actionButton("remove_calib_row", "Remove last row", class = "btn-sm btn-outline-danger")),
+                 actionButton("remove_calib_row", "Remove selected rows", class = "btn-sm btn-outline-danger")),
              DTOutput("calib_table"))
       )
     )
@@ -483,7 +494,8 @@ ui <- page_navbar(
                  "and any text column (treatment, class...) used for grouping."),
         div(class = "d-flex gap-2",
             actionButton("add_sample_row", "Add row", class = "btn-sm btn-success"),
-            actionButton("remove_sample_row", "Remove last row", class = "btn-sm btn-outline-danger")),
+            actionButton("remove_sample_row", "Remove selected rows", class = "btn-sm btn-outline-danger")),
+        helpText("In the sample table: click rows to select them, double-click a cell to edit it."),
         hr(),
         radioButtons("csv_format", "Export format",
                      choices = c("Excel FR (; and decimal comma)" = "fr",
@@ -507,7 +519,7 @@ ui <- page_navbar(
       card(full_screen = TRUE,
            card_header("Calculated concentrations"),
            DTOutput("results_table")),
-      card(card_header("Sample data (editable: double-click a cell)"),
+      card(card_header("Sample data (click rows to select, double-click a cell to edit)"),
            DTOutput("sample_table"))
     )
   ),
@@ -765,7 +777,7 @@ server <- function(input, output, session) {
   observeEvent(input$calib_file, load_calib_file(input$calib_file$datapath))
 
   output$calib_table <- renderDT({
-    datatable(calib_raw(), editable = "cell", rownames = FALSE, selection = "none",
+    datatable(calib_raw(), editable = "cell", rownames = FALSE, selection = "multiple",
               options = list(dom = "t", paging = FALSE, ordering = FALSE,
                              scrollY = "300px", scrollCollapse = TRUE))
   })
@@ -776,8 +788,14 @@ server <- function(input, output, session) {
   })
   observeEvent(input$add_calib_row, calib_raw(add_empty_row(calib_raw())))
   observeEvent(input$remove_calib_row, {
-    d <- calib_raw()
-    if (nrow(d) > 1) calib_raw(d[-nrow(d), , drop = FALSE])
+    sel <- input$calib_table_rows_selected
+    if (!length(sel)) {
+      showNotification("Select the rows to remove first: click them in the table.",
+                       type = "warning", duration = 5)
+      return()
+    }
+    calib_raw(remove_rows(calib_raw(), sel))
+    showNotification(sprintf("%d row(s) removed.", length(sel)), type = "message", duration = 3)
   })
 
   output$manual_point_selector <- renderUI({
@@ -885,7 +903,7 @@ server <- function(input, output, session) {
   })
 
   output$sample_table <- renderDT({
-    datatable(samples_raw(), editable = "cell", rownames = FALSE, selection = "none",
+    datatable(samples_raw(), editable = "cell", rownames = FALSE, selection = "multiple",
               options = list(dom = "t", paging = FALSE, ordering = FALSE,
                              scrollY = "300px", scrollX = TRUE, scrollCollapse = TRUE))
   })
@@ -894,8 +912,14 @@ server <- function(input, output, session) {
   })
   observeEvent(input$add_sample_row, samples_raw(add_empty_row(samples_raw())))
   observeEvent(input$remove_sample_row, {
-    d <- samples_raw()
-    if (nrow(d) > 1) samples_raw(d[-nrow(d), , drop = FALSE])
+    sel <- input$sample_table_rows_selected
+    if (!length(sel)) {
+      showNotification("Select the rows to remove first: click them in the table.",
+                       type = "warning", duration = 5)
+      return()
+    }
+    samples_raw(remove_rows(samples_raw(), sel))
+    showNotification(sprintf("%d row(s) removed.", length(sel)), type = "message", duration = 3)
   })
 
   # =========================================================== FIT (reactive)
